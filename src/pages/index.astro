@@ -1,0 +1,322 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const abecedario =
+  "A B C D E F G H I J K L M N Ñ O P Q R S T U V W X Y Z".split(" ");
+---
+
+<BaseLayout title="Abecedario Ruleta Centrada">
+  <header class="hero">
+    <h1>ABECEDARIO INTERACTIVO</h1>
+    <p>Haz clic en cualquier letra para centrarla y escucharla</p>
+  </header>
+
+  <main class="main-content">
+    <div class="carousel-wrapper">
+      <button
+        id="btn-prev"
+        class="nav-btn"
+        aria-label="Letra anterior"
+        disabled
+      >
+        ‹
+      </button>
+
+      <div class="carousel-container" id="carousel">
+        <div class="carousel-track" id="track">
+          {
+            abecedario.map((letra, index) => (
+              <div
+                class="letter-item"
+                role="button"
+                tabindex="0"
+                aria-label={`Letra ${letra}`}
+                data-letra={letra}
+                data-index={index}
+              >
+                <span class="letter">{letra}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+
+      <button id="btn-next" class="nav-btn" aria-label="Letra siguiente">
+        ›
+      </button>
+    </div>
+
+    <div class="info">
+      <p>🔊 Cada letra se centra al hacer clic</p>
+    </div>
+  </main>
+
+  <script is:inline>
+    document.addEventListener("DOMContentLoaded", () => {
+      const carousel = document.getElementById("carousel");
+      const items = document.querySelectorAll(".letter-item");
+      const btnPrev = document.getElementById("btn-prev");
+      const btnNext = document.getElementById("btn-next");
+
+      const ITEM_WIDTH = 140; // Debe coincidir con el ancho total en CSS (90px + gap ~50px)
+
+      // 🔑 Función clave: obtener el índice de la letra MÁS CENTRADA
+      function getCenteredIndex() {
+        const containerRect = carousel.getBoundingClientRect();
+        const containerCenter = containerRect.left + containerRect.width / 2;
+        let closestIndex = 0;
+        let minDistance = Infinity;
+
+        items.forEach((item, index) => {
+          const itemRect = item.getBoundingClientRect();
+          const itemCenter = itemRect.left + itemRect.width / 2;
+          const distance = Math.abs(containerCenter - itemCenter);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestIndex = index;
+          }
+        });
+        return closestIndex;
+      }
+
+      // Centrar en un índice
+      function centerOnIndex(index) {
+        if (index < 0 || index >= items.length) return;
+
+        const containerWidth = carousel.clientWidth;
+        const targetScroll =
+          index * ITEM_WIDTH - containerWidth / 2 + ITEM_WIDTH / 2;
+        const maxScroll = items.length * ITEM_WIDTH - containerWidth;
+        const clampedScroll = Math.max(0, Math.min(targetScroll, maxScroll));
+
+        carousel.scrollTo({
+          left: clampedScroll,
+          behavior: "smooth",
+        });
+
+        // Actualizar botones después
+        setTimeout(() => {
+          const centered = getCenteredIndex();
+          btnPrev.disabled = centered <= 0;
+          btnNext.disabled = centered >= items.length - 1;
+        }, 400);
+      }
+
+      // Sonido
+      function speakLetter(letter) {
+        if (!("speechSynthesis" in window)) return;
+        const text = letter === "Ñ" ? "eñe" : letter.toLowerCase();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "es-ES";
+        utterance.rate = 0.9;
+        speechSynthesis.speak(utterance);
+      }
+
+      // Actualizar apariencia
+      function updateVisual() {
+        const containerRect = carousel.getBoundingClientRect();
+        const containerCenter = containerRect.left + containerRect.width / 2;
+
+        items.forEach((item) => {
+          const itemRect = item.getBoundingClientRect();
+          const itemCenter = itemRect.left + itemRect.width / 2;
+          const distance = Math.abs(containerCenter - itemCenter);
+          const maxDistance = containerRect.width / 2;
+          const normalizedDistance = Math.min(distance / maxDistance, 1);
+          const opacity = 0.4 + 0.6 * (1 - normalizedDistance);
+          const scale = 0.7 + 0.5 * (1 - normalizedDistance);
+
+          item.style.opacity = opacity;
+          item.style.transform = `scale(${scale})`;
+        });
+      }
+
+      // 🚀 Inicializar
+      function init() {
+        // Centrar la primera letra
+        centerOnIndex(0);
+
+        // Eventos de scroll
+        let isScrolling = false;
+        carousel.addEventListener("scroll", () => {
+          if (!isScrolling) {
+            requestAnimationFrame(() => {
+              updateVisual();
+              const centered = getCenteredIndex();
+              btnPrev.disabled = centered <= 0;
+              btnNext.disabled = centered >= items.length - 1;
+              isScrolling = false;
+            });
+            isScrolling = true;
+          }
+        });
+
+        // Botones
+        btnPrev.addEventListener("click", () => {
+          const current = getCenteredIndex();
+          if (current > 0) centerOnIndex(current - 1);
+        });
+
+        btnNext.addEventListener("click", () => {
+          const current = getCenteredIndex();
+          if (current < items.length - 1) centerOnIndex(current + 1);
+        });
+
+        // Clic en letras
+        items.forEach((item) => {
+          item.addEventListener("click", () => {
+            const index = parseInt(item.dataset.index);
+            const letter = item.dataset.letra;
+            centerOnIndex(index);
+            speakLetter(letter);
+          });
+
+          item.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              item.click();
+            }
+          });
+        });
+      }
+
+      // Esperar a que el layout esté listo
+      setTimeout(init, 300);
+    });
+  </script>
+
+  <style>
+    .main-content {
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .carousel-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 1.5rem 0;
+      background: rgba(0, 20, 30, 0.3);
+      border-radius: 20px;
+      margin: 2rem auto;
+      max-width: 1000px;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: rgba(0, 240, 255, 0.5);
+      width: 36px;
+      height: 36px;
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: color 0.2s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: "Orbitron", monospace;
+      border-radius: 8px;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      color: #00f0ff;
+      background: rgba(0, 240, 255, 0.1);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.2;
+      cursor: not-allowed;
+    }
+
+    .carousel-container {
+      flex: 1;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      height: 120px;
+      position: relative;
+    }
+
+    .carousel-track {
+      display: flex;
+      gap: 2.5rem;
+      padding: 0 1rem;
+      min-width: min-content;
+      height: 100%;
+      align-items: center;
+    }
+
+    .letter-item {
+      flex: 0 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 90px;
+      height: 90px;
+      transition:
+        transform 0.4s cubic-bezier(0.2, 0.8, 0.4, 1),
+        opacity 0.4s ease;
+      cursor: pointer;
+      outline: none;
+      color: #00f0ff;
+      font-family: "Orbitron", monospace;
+      font-weight: 700;
+      text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+    }
+
+    .letter {
+      font-size: 2rem;
+      pointer-events: none;
+    }
+
+    .letter-item:focus {
+      outline: 2px solid rgba(0, 240, 255, 0.6);
+      border-radius: 12px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 2rem 1rem 1rem;
+    }
+
+    .hero h1 {
+      font-family: "Orbitron", sans-serif;
+      font-size: 2.5rem;
+      background: linear-gradient(to right, #00f0ff, #7b00ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    .info {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 1.5rem;
+      font-size: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .carousel-wrapper {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 1rem;
+      }
+      .nav-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 1.6rem;
+      }
+      .carousel-container {
+        height: 100px;
+      }
+      .letter-item {
+        width: 75px;
+        height: 75px;
+      }
+      .letter {
+        font-size: 1.7rem;
+      }
+    }
+  </style>
+</BaseLayout>

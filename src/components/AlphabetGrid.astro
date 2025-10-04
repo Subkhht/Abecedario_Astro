@@ -1,0 +1,58 @@
+---
+import LetterCard from "./LetterCard.astro";
+
+const abecedario =
+  "A B C D E F G H I J K L M N Ñ O P Q R S T U V W X Y Z".split(" ");
+---
+
+<section class="alphabet-section" aria-labelledby="alphabet-title">
+  <h2 id="alphabet-title" class="section-title">ABECEDARIO ESPAÑOL</h2>
+  <p class="subtitle">27 letras • Incluye la <strong>Ñ</strong></p>
+
+  <ul class="grid">
+    {abecedario.map((letra) => <LetterCard letra={letra} />)}
+  </ul>
+</section>
+
+<style>
+  .alphabet-section {
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+  }
+
+  .subtitle {
+    margin-bottom: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 1.2rem;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 600px) {
+    .grid {
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      gap: 0.8rem;
+    }
+    .section-title {
+      font-size: 2rem;
+    }
+  }
+</style>

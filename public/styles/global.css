@@ -1,0 +1,110 @@
+/* src/styles/global.css */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Exo+2:wght@300;400&display=swap');
+
+:root {
+    --bg: #0a0a14;
+    --primary: #00f0ff;
+    --secondary: #ff00e6;
+    --accent: #7b00ff;
+    --text: #ffffff;
+    --card-bg: rgba(15, 15, 35, 0.6);
+    --glow-primary: 0 0 15px rgba(0, 240, 255, 0.7);
+    --glow-secondary: 0 0 15px rgba(255, 0, 230, 0.7);
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at 10% 20%, rgba(0, 240, 255, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(255, 0, 230, 0.05) 0%, transparent 20%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+h1,
+h2 {
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 1px;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+/* --- CAROUSEL HORIZONTAL --- */
+.carousel-container {
+    width: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    padding: 2rem 0;
+    margin: 2rem 0;
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.carousel-container::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+}
+
+.carousel-track {
+    display: flex;
+    gap: 2rem;
+    padding: 0 2rem;
+    min-width: fit-content;
+    scroll-snap-align: center;
+}
+
+.carousel-item {
+    scroll-snap-align: center;
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 120px;
+    height: 120px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0.5;
+}
+
+.carousel-item.centered {
+    transform: scale(1.6);
+    opacity: 1;
+    filter: drop-shadow(0 0 20px var(--primary));
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .carousel-item {
+        width: 80px;
+        height: 80px;
+    }
+
+    .carousel-item.centered {
+        transform: scale(1.8);
+    }
+}

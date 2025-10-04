@@ -1,0 +1,89 @@
+---
+interface Props {
+  letra: string;
+}
+const { letra } = Astro.props;
+const isSpecial = letra === "Ñ";
+---
+
+<li
+  class="letter-card"
+  role="button"
+  tabindex="0"
+  aria-label={`Letra ${letra}`}
+  data-letra={letra}
+>
+  <span class="letter-glow"></span>
+  <span class="letter-text">{letra}</span>
+  {isSpecial && <span class="letter-badge">ES</span>}
+</li>
+
+<style>
+  .letter-card {
+    position: relative;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--card-bg);
+    border-radius: 16px;
+    cursor: pointer;
+    outline: none;
+    transition: var(--transition);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .letter-card:focus,
+  .letter-card:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow:
+      var(--glow-primary),
+      0 8px 30px rgba(0, 240, 255, 0.3);
+  }
+
+  .letter-text {
+    font-family: "Orbitron", monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-shadow: 0 0 10px currentColor;
+    z-index: 2;
+  }
+
+  .letter-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--secondary);
+    color: white;
+    font-size: 0.6rem;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-weight: bold;
+    box-shadow: 0 0 8px var(--secondary);
+  }
+
+  .letter-card.active {
+    animation: pulseGlow 0.6s ease-in-out;
+  }
+
+  @keyframes pulseGlow {
+    0% {
+      box-shadow:
+        var(--glow-primary),
+        0 0 0 rgba(0, 240, 255, 0.4);
+    }
+    50% {
+      box-shadow:
+        var(--glow-primary),
+        0 0 30px rgba(0, 240, 255, 0.8);
+    }
+    100% {
+      box-shadow:
+        var(--glow-primary),
+        0 0 0 rgba(0, 240, 255, 0.4);
+    }
+  }
+</style>

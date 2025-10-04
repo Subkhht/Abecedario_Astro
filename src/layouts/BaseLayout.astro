@@ -1,0 +1,37 @@
+---
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title || "Abecedario Futurista"}</title>
+    <meta
+      name="description"
+      content={description ||
+        "Aprende el abecedario en español con estilo futurista y accesible."}
+    />
+    <link rel="stylesheet" href="/styles/global.css" />
+    <script type="module" src="/scripts/alphabet-sound.js" defer></script>
+  </head>
+  <body>
+    <slot />
+    <footer class="footer">
+      <p>
+        © {new Date().getFullYear()} • Abecedario Futurista • Accesible para todos
+      </p>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .footer {
+    text-align: center;
+    padding: 1.5rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    margin-top: 2rem;
+  }
+</style>
