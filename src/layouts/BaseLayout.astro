@@ -35,16 +35,16 @@ const defaultDescription = "Aprende el abecedario en español con estilo futuris
     <meta name="twitter:description" content={description || defaultDescription} />
     
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
     
     <!-- Styles -->
-    <link rel="stylesheet" href="/styles/global.css" />
+    <link rel="stylesheet" href={`${import.meta.env.BASE_URL}styles/global.css`} />
     
     <!-- View Transitions API -->
     <ViewTransitions />
     
     <!-- Scripts -->
-    <script type="module" src="/scripts/alphabet-sound-improved.js" defer></script>
+    <script type="module" src={`${import.meta.env.BASE_URL}scripts/alphabet-sound-improved.js`} defer></script>
   </head>
   <body>
     <slot />

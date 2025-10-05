@@ -22,8 +22,8 @@ const abecedario = "A B C D E F G H I J K L M N Ñ O P Q R S T U V W X Y Z".spli
         Vista Cuadrícula
       </button>
       <button id="toggle-theme" class="btn-secondary" aria-label="Cambiar tema">
-        <span class="btn-icon">🌙</span>
-        Tema Oscuro
+        <span class="btn-icon">☀️</span>
+        Tema Claro
       </button>
     </div>
   </header>
@@ -112,6 +112,55 @@ const abecedario = "A B C D E F G H I J K L M N Ñ O P Q R S T U V W X Y Z".spli
   </main>
 
 
+  <script is:inline>
+    function initThemeToggle() {
+      const toggleThemeBtn = document.getElementById("toggle-theme");
+      
+      if (!toggleThemeBtn) {
+        console.error('Theme button not found!');
+        return;
+      }
+
+      // Cargar tema guardado al inicio
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'light') {
+        document.body.classList.add('light-theme');
+        toggleThemeBtn.innerHTML = '<span class="btn-icon">🌙</span>Tema Oscuro';
+      } else {
+        document.body.classList.remove('light-theme');
+        toggleThemeBtn.innerHTML = '<span class="btn-icon">☀️</span>Tema Claro';
+      }
+
+      // Toggle tema
+      toggleThemeBtn.addEventListener("click", function() {
+        console.log('Toggle theme clicked');
+        document.body.classList.toggle('light-theme');
+        const isLight = document.body.classList.contains('light-theme');
+        console.log('Is light theme:', isLight);
+        console.log('Body classes:', document.body.className);
+        
+        toggleThemeBtn.innerHTML = isLight 
+          ? '<span class="btn-icon">🌙</span>Tema Oscuro'
+          : '<span class="btn-icon">☀️</span>Tema Claro';
+        
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        console.log('Theme saved:', isLight ? 'light' : 'dark');
+      });
+
+      console.log('Theme toggle initialized');
+    }
+
+    // Inicializar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initThemeToggle);
+    } else {
+      initThemeToggle();
+    }
+
+    // También para View Transitions
+    document.addEventListener('astro:page-load', initThemeToggle);
+  </script>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const carousel = document.getElementById("carousel") as HTMLElement;
@@ -121,7 +170,6 @@ const abecedario = "A B C D E F G H I J K L M N Ñ O P Q R S T U V W X Y Z".spli
       const btnNext = document.getElementById("btn-next") as HTMLButtonElement;
       const currentLetterDisplay = document.getElementById("current-letter") as HTMLElement;
       const toggleViewBtn = document.getElementById("toggle-view") as HTMLButtonElement;
-      const toggleThemeBtn = document.getElementById("toggle-theme") as HTMLButtonElement;
       const carouselView = document.getElementById("carousel-view") as HTMLElement;
       const gridView = document.getElementById("grid-view") as HTMLElement;
 
@@ -240,17 +288,6 @@ const abecedario = "A B C D E F G H I J K L M N Ñ O P Q R S T U V W X Y Z".spli
         }
       }
 
-      // Toggle tema
-      function toggleTheme() {
-        document.body.classList.toggle('light-theme');
-        const isLight = document.body.classList.contains('light-theme');
-        toggleThemeBtn.innerHTML = isLight 
-          ? '<span class="btn-icon">☀️</span>Tema Claro'
-          : '<span class="btn-icon">🌙</span>Tema Oscuro';
-        
-        localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      }
-
       // Manejar clic en letra
       function handleLetterClick(element: HTMLElement) {
         const index = parseInt(element.dataset.index || "0");
@@ -267,13 +304,6 @@ const abecedario = "A B C D E F G H I J K L M N Ñ O P Q R S T U V W X Y Z".spli
 
       // Inicializar
       function init() {
-        // Cargar tema guardado
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'light') {
-          document.body.classList.add('light-theme');
-          toggleThemeBtn.innerHTML = '<span class="btn-icon">☀️</span>Tema Claro';
-        }
-
         // Centrar primera letra
         centerOnIndex(0);
         updateProgress();
@@ -302,7 +332,6 @@ const abecedario = "A B C D E F G H I J K L M N Ñ O P Q R S T U V W X Y Z".spli
 
         // Toggle botones
         toggleViewBtn.addEventListener("click", toggleView);
-        toggleThemeBtn.addEventListener("click", toggleTheme);
 
         // Eventos de letras en carrusel
         items.forEach((item) => {
@@ -347,6 +376,17 @@ const abecedario = "A B C D E F G H I J K L M N Ñ O P Q R S T U V W X Y Z".spli
 
       // Iniciar después de que el layout esté listo
       setTimeout(init, 100);
+    });
+
+    // Soporte para View Transitions de Astro
+    document.addEventListener('astro:page-load', () => {
+      console.log('Astro page loaded');
+      setTimeout(() => {
+        const btn = document.getElementById("toggle-theme");
+        if (btn) {
+          console.log('Theme button found after page load');
+        }
+      }, 100);
     });
   </script>
 
