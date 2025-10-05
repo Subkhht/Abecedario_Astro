@@ -1,5 +1,14 @@
 ---
+import { ViewTransitions } from 'astro:transitions';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
 const { title, description } = Astro.props;
+const defaultTitle = "Abecedario Interactivo";
+const defaultDescription = "Aprende el abecedario en español con estilo futurista, interactivo y totalmente accesible.";
 ---
 
 <!doctype html>
@@ -7,20 +16,43 @@ const { title, description } = Astro.props;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title || "Abecedario Futurista"}</title>
-    <meta
-      name="description"
-      content={description ||
-        "Aprende el abecedario en español con estilo futurista y accesible."}
-    />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- SEO Meta Tags -->
+    <title>{title || defaultTitle}</title>
+    <meta name="description" content={description || defaultDescription} />
+    <meta name="keywords" content="abecedario, español, educación, interactivo, aprendizaje" />
+    <meta name="author" content="Abecedario Interactivo" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title || defaultTitle} />
+    <meta property="og:description" content={description || defaultDescription} />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title || defaultTitle} />
+    <meta name="twitter:description" content={description || defaultDescription} />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="/styles/global.css" />
-    <script type="module" src="/scripts/alphabet-sound.js" defer></script>
+    
+    <!-- View Transitions API -->
+    <ViewTransitions />
+    
+    <!-- Scripts -->
+    <script type="module" src="/scripts/alphabet-sound-improved.js" defer></script>
   </head>
   <body>
     <slot />
     <footer class="footer">
       <p>
-        © {new Date().getFullYear()} • Abecedario Futurista • Accesible para todos
+        © {new Date().getFullYear()} • Abecedario Interactivo • Hecho con 
+        <span class="heart" aria-label="amor">❤️</span> 
+        y <a href="https://astro.build" target="_blank" rel="noopener" class="astro-link">Astro</a>
       </p>
     </footer>
   </body>
@@ -33,5 +65,27 @@ const { title, description } = Astro.props;
     color: rgba(255, 255, 255, 0.6);
     font-size: 0.9rem;
     margin-top: 2rem;
+    border-top: 1px solid rgba(0, 240, 255, 0.1);
+  }
+  
+  .heart {
+    color: var(--secondary);
+    animation: heartbeat 1.5s ease-in-out infinite;
+  }
+  
+  .astro-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+  }
+  
+  .astro-link:hover {
+    text-shadow: 0 0 10px var(--primary);
+  }
+  
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    25% { transform: scale(1.1); }
   }
 </style>
